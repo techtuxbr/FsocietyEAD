@@ -4,17 +4,18 @@
     const mongoose = require('mongoose')
     const bcrypt = require('bcryptjs')
     const passport = require('passport')
+    const {authBlock} = require('../helpers/authBlock');
 // Loading Database models
     require('../models/User')
     const User = mongoose.model('users')
 
 // Register functionality
     // Register form
-        router.get("/register", (req, res) => {
+        router.get("/register", authBlock, (req, res) => {
             res.render('users/register')
         })
     // Register process
-        router.post('/register', (req, res) => {
+        router.post('/register', authBlock, (req, res) => {
             let errors = [];
             if(!req.body.name){
                 errors.push({text:"Por favor adicione um nome válido"})
@@ -82,11 +83,11 @@
 
 // Login functionality
     // Login
-        router.get("/login", (req, res) => {
+        router.get("/login", authBlock, (req, res) => {
             res.render("users/login")
         })
     // Login Process
-        router.post("/login", (req, res, next) => {
+        router.post("/login", authBlock, (req, res, next) => {
             passport.authenticate('local',{
                 successRedirect: '/',
                 failureRedirect: '/users/login',
