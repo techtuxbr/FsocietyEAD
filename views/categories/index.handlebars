@@ -1,0 +1,14 @@
+<a href="categories/add"><button class="btn btn-success mb-4 mt-4">Nova categoria</button></a>
+{{#each categories}}
+	<div class="card card-body">
+		<h4>{{name}}</h4>
+		<p>Slug: {{slug}}</p>
+		<a href="/admin/categories/edit/{{id}}" class="btn btn-dark btn-block mb-2">Editar</a>
+		<form method="post" action="/admin/categories/{{id}}?_method=DELETE">
+			<input type="hidden" name="_method" value="DELETE">
+			<input type="submit" class="btn btn-danger btn-block" value="Deletar">
+		</form>
+	</div>
+{{else}}
+	<p>Nenhuma categoria criada</p>
+{{/each}}

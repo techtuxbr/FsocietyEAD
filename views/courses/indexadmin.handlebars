@@ -1,0 +1,16 @@
+<a href="courses/add"><button class="btn btn-success mb-4 mt-4">Novo curso</button></a>
+{{#each courses}}
+	<div class="card card-body mb-3">
+		<h4>{{title}}</h4>
+		<p>Slug: {{slug}}</p>
+        <p>Categoria: {{category.name}}</p>
+		<a href="/admin/courses/edit/{{id}}" class="btn btn-dark btn-block mb-2">Editar</a>
+		<form method="post" action="/admin/courses/?_method=DELETE">
+			<input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="id" value="{{_id}}">
+			<input type="submit" class="btn btn-danger btn-block" value="Deletar">
+		</form>
+	</div>
+{{else}}
+	<p>Nenhum curso criado</p> 
+{{/each}}
