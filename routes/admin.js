@@ -1,15 +1,21 @@
-const express = require('express')
-const router = express.Router()
-const mongoose = require('mongoose')
-require('../models/Category')
-require('../models/Course')
-require('../models/Lesson')
-const Category = mongoose.model('categories')
-const Course = mongoose.model('courses')
-const Lesson = mongoose.model('lessons')
-router.get('/', (req, res) => {
-    res.render('admin/index')
-})
+// Importing modules
+    const express = require('express')
+    const router = express.Router()
+    const mongoose = require('mongoose')
+    const bcrypt = require('bcryptjs')
+// Importing database models
+    require('../models/Category')
+    require('../models/Course')
+    require('../models/Lesson')
+    require('../models/User')
+    const Category = mongoose.model('categories')
+    const Course = mongoose.model('courses')
+    const Lesson = mongoose.model('lessons')
+    const User = mongoose.model('users')
+// Admin main page
+    router.get('/', (req, res) => {
+        res.render('admin/index')
+    })
 
 // Admin courses CRUD Routes
 
@@ -340,4 +346,176 @@ router.delete('/lesson', (req, res) => {
         })
     })
 
+// Users CRUD Routes
+    // Users List
+        router.get('/users', (req, res) => {
+            User.find({deactivate: 0}).then(users => {
+                res.render('users/index', {users: users})
+            }).catch(err => {
+                req.flash("error_msg", "Houve um erro interno ao listar os usuários")
+                res.redirect("/admin/")
+            })
+        })
+    // User creation form
+        router.get('/users/add', (req, res) => {
+            res.render('users/add')
+        })
+    // User creation process
+        router.post('/users/add', (req, res) => {
+            let errors = [];
+            if(!req.body.name){
+                errors.push({text:"Por favor adicione um nome válido"})
+            }
+            if(!req.body.surname){
+                errors.push({text: "Por favor adicione um sobrenome"})
+            }
+            if(!req.body.email){
+                errors.push({text: "Por favor adicione um email"})
+            }
+            if(!req.body.password){
+                errors.push({text:"Por favor adicione uma senha"})
+            }
+            if(req.body.password != req.body.password2){
+                errors.push({text:"As senhas tem que ser iguais"})
+            }
+            if(!req.body.role || (req.body.role != 0 && req.body.role != 1 && req.body.role != 2 && req.body.role !=3)){
+                errors.push({text:"Por favor selecione um tipo válido para o usuário"})
+            }
+            if(errors.length > 0){
+                res.render('users/add', {errors: errors})
+                return
+            }else{
+                User.findOne({email: req.body.email}).then(user => {
+                    if(user){
+                        errors.push({text: "Já existe uma conta com este e-mail"})
+                        res.render('users/add', {errors: errors})
+                    }else{
+                        const newUser = new User({
+                            name: req.body.name,
+                            surname: req.body.surname,
+                            email: req.body.email,
+                            password: req.body.password,
+                            role: req.body.role,
+                            deactivate: 0
+                        })
+                
+                        bcrypt.genSalt(10, (err, salt) => {
+                            bcrypt.hash(newUser.password, salt, (err, hash) => {
+                                if(err) throw err;
+                                newUser.password = hash;
+                                newUser.save().then(user => {
+                                    req.flash('success_msg', 'Usuário criado com sucesso')
+                                    res.redirect('/admin/users');
+                                }).catch(err => {
+                                    console.log(err)
+                                    return;
+                                })
+                            })
+                        })
+                    }
+                }).catch(err => {
+                    req.flash('error_msg', "Houve um erro intero ao registrar o usuário!")
+                    res.redirect('/admin/users')
+                })
+            }
+        })
+    // User edit from
+        router.get('/users/:id/edit', (req, res) => {
+            User.findOne({_id: req.params.id}).then(user => {
+                res.render('users/edit', {user: user})
+            }).catch(err => {
+                req.flash('error_msg', "Este usuário não existe")
+                res.redirect('/admin/users')
+            })
+        })
+    // User edit proccess
+        router.post('/users/edit', (req, res) => {
+            let errors = [];
+            if(!req.body.name){
+                errors.push({text:"Por favor adicione um nome válido"})
+            }
+            if(!req.body.surname){
+                errors.push({text: "Por favor adicione um sobrenome"})
+            }
+            if(!req.body.email){
+                errors.push({text: "Por favor adicione um email"})
+            }
+            if(!req.body.role || (req.body.role != 0 && req.body.role != 1 && req.body.role != 2 && req.body.role !=3)){
+                errors.push({text:"Por favor selecione um tipo válido para o usuário"})
+            }
+            if(!req.body.id){
+                error.push({text: "ID inválida"})
+            }
+            if(errors.length > 0){
+                res.render('users/add', {errors: errors, course:{
+                    name: req.body.name,
+                    surname: req.body.surname,
+                    email: req.body.email,
+                    bio: req.body.bio,
+                    picture: req.body.picture
+                }})
+                return
+            }else{
+                User.findOne({_id: req.body.id}).then(user => {
+                    User.findOne({email: req.body.email}).then(userAux => {
+                        if(userAux){
+                            if(user.email == userAux.email){
+                                user.name = req.body.name
+                                user.surname = req.body.surname
+                                user.email = req.body.email
+                                user.bio = req.body.bio
+                                user. picture = req.body.picture
+                                user.save().then(() => {
+                                    req.flash('success_msg', "Usuário editado com sucesso")
+                                    res.redirect('/admin/users')            
+                                }).catch(err => {
+                                    req.flash('error_msg', "Houve um erro ao salvar o registro no banco")
+                                    res.redirect('/admin/users')
+                                })
+                            }else{
+                                req.flash('error_msg', "Já existe um conta com este e-mail")
+                                res.redirect('/admin/users')  
+                            }
+                        }else{
+                            user.name = req.body.name
+                            user.surname = req.body.surname
+                            user.email = req.body.email
+                            user.bio = req.body.bio
+                            user. picture = req.body.picture
+                            user.save().then(() => {
+                                req.flash('success_msg', "Usuário editado com sucesso")
+                                res.redirect('/admin/users')            
+                            }).catch(err => {
+                                req.flash('error_msg', "Houve um erro ao salvar o registro no banco")
+                                res.redirect('/admin/users')
+                            })
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                        req.flash('error_msg', "Houve um erro durante a verificação do e-mail")
+                        res.redirect('/admin/users')
+                    })
+                }).catch(err => {
+                    req.flash('error_msg', "Este usuário não existe")
+                    res.redirect('/admin/users')
+                })
+            }
+    })
+
+    // User creation process
+        router.post('/users/deactivate', (req, res) => {
+            User.findOne({_id: req.body.id}).then(user => {
+                user.deactivate = 1
+                user.save().then(() => {
+                    req.flash('success_msg', 'Usuário desativado com sucesso')
+                    res.redirect('/admin/users');
+                }).catch(err => {
+                    req.flash('error_msg', "Houve um erro intero ao tentar desativar o usuário! 2")
+                    res.redirect('/admin/')
+                })
+            }).catch(err => {
+                req.flash('error_msg', "Houve um erro intero ao tentar desativar o usuário!")
+                res.redirect('/admin/')
+            })
+        })    
 module.exports = router;

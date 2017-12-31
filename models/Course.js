@@ -35,6 +35,11 @@ const CourseSchema = new Schema({
         type: String,
         require: true
     },
+    price: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     date: {
         type: Date,
         required: true,

@@ -1,0 +1,41 @@
+{{#each errors}}
+	<div class="alert alert-danger">{{text}}</div>
+{{else}}
+
+{{/each}}
+<div class="card card-body">
+	<h3>Editar usuário</h3>
+	<form action="/admin/users/edit" method="post">
+        <input type="hidden" class="form-control" name="id" required value="{{user.id}}">
+		<div class="form-group">
+			<label for="name">Nome</label>
+			<input type="text" class="form-control" name="name" required value="{{user.name}}">
+		</div>
+		<div class="form-group">
+			<label for="surname">Sobrenome</label>
+			<input type="text" class="form-control" name="surname" required value="{{user.surname}}">
+		</div>
+		<div class="form-group">
+			<label for="email">Email: </label>
+			<input type="email" class="form-control" name="email" required value="{{user.email}}">
+		</div>
+		<div class="form-group">
+			<label for="role">Tipo: </label>
+            <select name="role" id="role" class="custom-select" required>
+                <option value="0">Usuário</option>
+                <option value="1">Moderador</option>
+                <option value="2">Autor</option>
+                <option value="3">Admin</option>
+            </select>
+		</div>
+		<div class="form-group">
+			<label for="bio">Bio: </label>
+			<textarea name="bio" id="bio" class="form-control">{{user.bio}}</textarea>
+		</div>
+		<div class="form-group">
+			<label for="picture">Foto do perfil: </label>
+			<input type="url" class="form-control" name="picture" value="{{user.picture}}">
+		</div>
+		<button class="btn btn-primary" type="submit">Editar usuário</button>
+	</form>
+</div>

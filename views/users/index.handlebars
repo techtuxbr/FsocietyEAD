@@ -1,0 +1,14 @@
+<a href="users/add"><button class="btn btn-success mb-4 mt-4">Novo usuário</button></a>
+{{#each users}}
+	<div class="card card-body mb-3">
+		<h4>{{name}} {{surname}}</h4>
+		<p>Email: {{email}}</p>
+		<a href="/admin/users/{{id}}/edit" class="btn btn-dark btn-block mb-2">Editar</a>
+		<form method="post" action="/admin/users/deactivate">
+            <input type="hidden" name="id" value="{{_id}}">
+			<input type="submit" class="btn btn-danger btn-block" value="Desativar usuário">
+		</form>
+	</div>
+{{else}}
+	<p>Nenhum usuário criado</p> 
+{{/each}}
