@@ -1,10 +1,12 @@
 const express = require('express')
-const router = express.Router();
+const router = express.Router()
 const mongoose = require('mongoose')
-require('../models/Category');
-require('../models/Course');
-const Category = mongoose.model('categories');
-const Course = mongoose.model('courses');
+require('../models/Category')
+require('../models/Course')
+require('../models/Lesson')
+const Category = mongoose.model('categories')
+const Course = mongoose.model('courses')
+const Lesson = mongoose.model('lessons')
 router.get('/', (req, res) => {
     res.render('admin/index')
 })
@@ -12,7 +14,6 @@ router.get('/', (req, res) => {
 // Admin courses CRUD Routes
 
     router.get('/courses', (req, res) => {
-        let coursesArray = []
         Course.find({}).populate('category').sort({date:'desc'}).then(courses => {
             res.render('courses/indexadmin', {courses: courses})
         })
@@ -165,6 +166,89 @@ router.get('/', (req, res) => {
             res.redirect('/admin/courses')   
         })
     })
+
+// Admin lessons CRUD Routes
+
+router.get('/courses/:id/lessons', (req, res) => {
+    Course.findOne({_id: req.params.id}).then(course => {
+        return course
+    }).catch(err => {
+        req.flash('error_msg', 'Este curso não existe')
+        res.redirect('/admin/courses')  
+    }).then(course => {
+        Lesson.find({course: course._id}).populate('course').sort({date:'asc'}).then(lessons => {
+            res.render('courses/lessons', {course: course, lessons})
+        })
+    })
+})
+
+router.get('/courses/:id/lessons/add', (req, res) => {
+    res.render('courses/lessons/add', {id: req.params.id})
+})
+
+router.post('/courses/lesson/add', (req, res) => {
+    const newLesson = {
+        title: req.body.title,
+        course: req.body.id,
+        source: req.body.source,
+        time: Number((req.body.timeMinutes*60)) + Number(req.body.timeSeconds)
+    }
+    new Lesson(newLesson).save().then(() => {
+        req.flash('success_msg', 'Aula criada com sucesso')
+        res.redirect(`/admin/courses/${req.body.id}/lessons`)  
+    }).catch(err => {
+    })
+})
+
+router.get('/lessons/edit/:id', (req, res) => {
+    Lesson.findOne({_id: req.params.id}).then( lesson => {
+       console.log(lesson)
+        // Converting seconds to minutes
+            let time = lesson.time
+            time = time*0.0166667;
+            let timeMinutes = Math.trunc(time)
+            let timeSeconds = (Math.trunc((time%1)*60))
+        // Rendering View with Data
+        console.log(lesson)
+            res.render('courses/lessons/edit', {lesson: lesson, timeMinutes: timeMinutes, timeSeconds: timeSeconds})
+    })
+})
+
+
+router.post('/lesson/edit', (req, res) => {
+    const editLesson = {
+        title: req.body.title,
+        source: req.body.source,
+        time: Number((req.body.timeMinutes*60)) + Number(req.body.timeSeconds)
+    }
+
+    Lesson.findOne({_id: req.body.id}).then(lesson => {
+        lesson.title = editLesson.title
+        lesson.source = editLesson.source
+        lesson.time = editLesson.time
+    lesson.save().then(lesson => {
+        req.flash('success_msg', 'Aula editada com sucesso')
+        res.redirect(`/admin/courses/${lesson.course}/lessons`)
+    } ).catch(err =>{
+        req.flash('error_msg', 'Houver um erro ao salvar a edição da aula')
+        res.redirect('/admin/courses/')
+    } )
+}).catch(err => {
+    req.flash('error_msg', 'Houver um erro ao enviar os dados para edição da aula')
+    res.redirect('/admin/courses/')
+})
+
+})
+
+router.delete('/lesson', (req, res) => {
+    Lesson.remove({_id: req.body.id}).then(() => {
+        req.flash('success_msg', 'Aula DELETADA com sucesso')
+        res.redirect(`/admin/courses/${req.body.courseId}/lessons`)
+    }).catch(err => {
+        req.flash('error_msg', 'Houver um erro interno ao tentar deletar os dados da aula')
+        res.redirect(`/admin/courses/${req.body.courseId}/lessons`)
+    })
+})
 
 // Admin categories CRUD Routes
     router.get('/categories', (req, res) => {

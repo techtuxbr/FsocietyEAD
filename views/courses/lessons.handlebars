@@ -1,0 +1,19 @@
+<h3>Aulas do curso: {{course.title}}</h3>
+<hr>
+<a href="/admin/courses/{{course.id}}/lessons/add"><button class="btn btn-success">Nova aula</button></a>
+{{#each lessons}}
+	<div class="card card-body mb-3 mt-5">
+		<h4>{{title}}</h4>
+		<p>Duração: <span class="duration">{{time}}</span> minutos</p>
+		<a href="/admin/lessons/edit/{{id}}" class="btn btn-dark btn-block mb-2">Editar</a>
+		<form method="post" action="/admin/lesson/?_method=DELETE">
+			<input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="id" value="{{_id}}">
+			<input type="hidden" name="courseId" value="{{course.id}}">
+			<input type="submit" class="btn btn-danger btn-block" value="Deletar">
+		</form>
+	</div>
+{{else}}
+	<p>Nenhuma aula criada</p> 
+{{/each}}
+<script src="/js/tool.js"></script>

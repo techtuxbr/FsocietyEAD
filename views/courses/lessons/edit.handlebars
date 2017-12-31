@@ -1,0 +1,27 @@
+{{#each errors}}
+	<div class="alert alert-danger">{{text}}</div>
+{{else}}
+
+{{/each}}
+<div class="card card-body">
+	<h3>Nova aula</h3>
+	<form action="/admin/lesson/edit" method="post">
+		<input type="hidden" value="{{lesson.id}}" name="id">
+        <div class="form-group">
+			<label for="title">Título</label>
+			<input type="text" class="form-control" name="title" value="{{lesson.title}}">
+		</div>
+		<div class="form-group">
+			<label for="source">Vídeo Iframe</label>
+			<textarea name="source" class="form-control">{{lesson.source}}</textarea>
+		</div>
+		<div class="form-group">
+			<label for="time">Tempo</label>
+            <br>Minutos:
+			    <input name="timeMinutes" type="number" class="form-control" value="{{timeMinutes}}">
+            Segundos:
+                <input name="timeSeconds" type="number"class="form-control" value="{{timeSeconds}}">
+		</div>
+		<button class="btn btn-primary" type="submit">Editar aula</button>
+	</form>
+</div>

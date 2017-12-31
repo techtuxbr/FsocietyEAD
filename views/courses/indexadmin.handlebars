@@ -5,6 +5,7 @@
 		<p>Slug: {{slug}}</p>
         <p>Categoria: {{category.name}}</p>
 		<a href="/admin/courses/edit/{{id}}" class="btn btn-dark btn-block mb-2">Editar</a>
+		<a href="/admin/courses/{{id}}/lessons" class="btn btn-success btn-block mb-3">Aulas</a>
 		<form method="post" action="/admin/courses/?_method=DELETE">
 			<input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="id" value="{{_id}}">
