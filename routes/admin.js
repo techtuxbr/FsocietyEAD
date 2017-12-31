@@ -3,6 +3,7 @@
     const router = express.Router()
     const mongoose = require('mongoose')
     const bcrypt = require('bcryptjs')
+    const {ensureIsAdmin} = require('../helpers/isAdmin');
 // Importing database models
     require('../models/Category')
     require('../models/Course')
@@ -13,19 +14,19 @@
     const Lesson = mongoose.model('lessons')
     const User = mongoose.model('users')
 // Admin main page
-    router.get('/', (req, res) => {
+    router.get('/', ensureIsAdmin, (req, res) => {
         res.render('admin/index')
     })
 
 // Admin courses CRUD Routes
 
-    router.get('/courses', (req, res) => {
+    router.get('/courses', ensureIsAdmin, (req, res) => {
         Course.find({}).populate('category').sort({date:'desc'}).then(courses => {
             res.render('courses/indexadmin', {courses: courses})
         })
     })
 
-    router.get('/courses/add', (req, res) => {
+    router.get('/courses/add', ensureIsAdmin, (req, res) => {
         Category.find({}).then(categories => {
             res.render('courses/add', {categories: categories})
         }).catch(err => {
@@ -34,7 +35,7 @@
         })
     })
 
-    router.post('/courses/add', (req, res) => {
+    router.post('/courses/add', ensureIsAdmin, (req, res) => {
         let errors = [];
         if(!req.body.title){
             errors.push({text: 'Por favor adicione um nome'})
@@ -85,7 +86,7 @@
         }
     })
 
-    router.get('/courses/edit/:id', (req, res) => {
+    router.get('/courses/edit/:id', ensureIsAdmin, (req, res) => {
         Course.findOne({_id: req.params.id}).then(course => {
                 return course
         }).then(course => {
@@ -99,7 +100,7 @@
         })
     })
 
-    router.post('/courses/edit', (req, res) => {
+    router.post('/courses/edit', ensureIsAdmin, (req, res) => {
         let errors = [];
         if(!req.body.title){
             errors.push({text: 'Por favor adicione um nome'})
@@ -163,7 +164,7 @@
         }
     })
 
-    router.delete('/courses', (req, res) => {
+    router.delete('/courses', ensureIsAdmin, (req, res) => {
         Course.remove({_id: req.body.id}).then(() => {
             req.flash('success_msg', 'Curso DELETADO com sucesso')
             res.redirect('/admin/courses')
@@ -175,7 +176,7 @@
 
 // Admin lessons CRUD Routes
 
-router.get('/courses/:id/lessons', (req, res) => {
+router.get('/courses/:id/lessons', ensureIsAdmin, (req, res) => {
     Course.findOne({_id: req.params.id}).then(course => {
         return course
     }).catch(err => {
@@ -188,11 +189,11 @@ router.get('/courses/:id/lessons', (req, res) => {
     })
 })
 
-router.get('/courses/:id/lessons/add', (req, res) => {
+router.get('/courses/:id/lessons/add', ensureIsAdmin, (req, res) => {
     res.render('courses/lessons/add', {id: req.params.id})
 })
 
-router.post('/courses/lesson/add', (req, res) => {
+router.post('/courses/lesson/add', ensureIsAdmin, (req, res) => {
     const newLesson = {
         title: req.body.title,
         course: req.body.id,
@@ -206,7 +207,7 @@ router.post('/courses/lesson/add', (req, res) => {
     })
 })
 
-router.get('/lessons/edit/:id', (req, res) => {
+router.get('/lessons/edit/:id', ensureIsAdmin, (req, res) => {
     Lesson.findOne({_id: req.params.id}).then( lesson => {
        console.log(lesson)
         // Converting seconds to minutes
@@ -221,7 +222,7 @@ router.get('/lessons/edit/:id', (req, res) => {
 })
 
 
-router.post('/lesson/edit', (req, res) => {
+router.post('/lesson/edit', ensureIsAdmin, (req, res) => {
     const editLesson = {
         title: req.body.title,
         source: req.body.source,
@@ -246,7 +247,7 @@ router.post('/lesson/edit', (req, res) => {
 
 })
 
-router.delete('/lesson', (req, res) => {
+router.delete('/lesson', ensureIsAdmin, (req, res) => {
     Lesson.remove({_id: req.body.id}).then(() => {
         req.flash('success_msg', 'Aula DELETADA com sucesso')
         res.redirect(`/admin/courses/${req.body.courseId}/lessons`)
@@ -257,17 +258,17 @@ router.delete('/lesson', (req, res) => {
 })
 
 // Admin categories CRUD Routes
-    router.get('/categories', (req, res) => {
+    router.get('/categories', ensureIsAdmin, (req, res) => {
         Category.find({}).sort({date:'desc'}).then(categories => {
             res.render('categories/index', {categories: categories})
         })
     })
 
-    router.get('/categories/add', (req, res) => {
+    router.get('/categories/add', ensureIsAdmin, (req, res) => {
         res.render('categories/add')
     })
 
-    router.post('/categories/add', (req, res) => {
+    router.post('/categories/add', ensureIsAdmin, (req, res) => {
         let errors = [];
         if(!req.body.name){
             errors.push({text: 'Por favor adicione um nome'})
@@ -293,7 +294,7 @@ router.delete('/lesson', (req, res) => {
         }
     })
 
-    router.get('/categories/edit/:id', (req, res) => {
+    router.get('/categories/edit/:id', ensureIsAdmin, (req, res) => {
         Category.findOne({_id: req.params.id}).then(category => {
                 res.render('categories/edit', {category: category})
                 return
@@ -304,7 +305,7 @@ router.delete('/lesson', (req, res) => {
         })
     })
 
-    router.post('/categories/edit', (req, res) => {
+    router.post('/categories/edit', ensureIsAdmin, (req, res) => {
         let errors = [];
         if(!req.body.name){
             errors.push({text: 'Por favor adicione um nome'})
@@ -336,7 +337,7 @@ router.delete('/lesson', (req, res) => {
         }
     })
 
-    router.delete('/categories/:id', (req, res) => {
+    router.delete('/categories/:id', ensureIsAdmin, (req, res) => {
         Category.remove({_id: req.params.id}).then(() => {
             req.flash('success_msg', 'Categoria DELETADA com sucesso')
             res.redirect('/admin/categories')
@@ -348,7 +349,7 @@ router.delete('/lesson', (req, res) => {
 
 // Users CRUD Routes
     // Users List
-        router.get('/users', (req, res) => {
+        router.get('/users', ensureIsAdmin, (req, res) => {
             User.find({deactivate: 0}).then(users => {
                 res.render('users/index', {users: users})
             }).catch(err => {
@@ -357,7 +358,7 @@ router.delete('/lesson', (req, res) => {
             })
         })
     // User creation form
-        router.get('/users/add', (req, res) => {
+        router.get('/users/add', ensureIsAdmin, (req, res) => {
             res.render('users/add')
         })
     // User creation process
@@ -420,7 +421,7 @@ router.delete('/lesson', (req, res) => {
             }
         })
     // User edit from
-        router.get('/users/:id/edit', (req, res) => {
+        router.get('/users/:id/edit', ensureIsAdmin, (req, res) => {
             User.findOne({_id: req.params.id}).then(user => {
                 res.render('users/edit', {user: user})
             }).catch(err => {
@@ -429,7 +430,7 @@ router.delete('/lesson', (req, res) => {
             })
         })
     // User edit proccess
-        router.post('/users/edit', (req, res) => {
+        router.post('/users/edit', ensureIsAdmin, (req, res) => {
             let errors = [];
             if(!req.body.name){
                 errors.push({text:"Por favor adicione um nome válido"})
@@ -465,6 +466,7 @@ router.delete('/lesson', (req, res) => {
                                 user.email = req.body.email
                                 user.bio = req.body.bio
                                 user. picture = req.body.picture
+                                user.role = req.body.role
                                 user.save().then(() => {
                                     req.flash('success_msg', "Usuário editado com sucesso")
                                     res.redirect('/admin/users')            
@@ -473,7 +475,7 @@ router.delete('/lesson', (req, res) => {
                                     res.redirect('/admin/users')
                                 })
                             }else{
-                                req.flash('error_msg', "Já existe um conta com este e-mail")
+                                req.flash('error_msg', "Já existe uma conta com este e-mail")
                                 res.redirect('/admin/users')  
                             }
                         }else{
@@ -482,6 +484,7 @@ router.delete('/lesson', (req, res) => {
                             user.email = req.body.email
                             user.bio = req.body.bio
                             user. picture = req.body.picture
+                            user.role = req.body.role
                             user.save().then(() => {
                                 req.flash('success_msg', "Usuário editado com sucesso")
                                 res.redirect('/admin/users')            
@@ -503,7 +506,7 @@ router.delete('/lesson', (req, res) => {
     })
 
     // User creation process
-        router.post('/users/deactivate', (req, res) => {
+        router.post('/users/deactivate', ensureIsAdmin, (req, res) => {
             User.findOne({_id: req.body.id}).then(user => {
                 user.deactivate = 1
                 user.save().then(() => {

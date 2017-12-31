@@ -1,0 +1,32 @@
+{{>_errors}}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card card-body">
+            <h3 class="text-center">Criar conta</h3>
+            <form action="/users/register" method="POST">
+                <center><img src="/img/mask3.png" class="logo" width="200px"></center>
+                <div class="form-group">
+                    <label for="name">Nome</label>
+                    <input type="text" class="form-control" name="name" value="{{name}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="surname">Sobrenome</label>
+                    <input type="text" class="form-control" name="surname" value="{{surname}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" name="email" value="{{email}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" class="form-control" name="password" value="{{password}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Repita a senha</label>
+                    <input type="password" class="form-control" name="repeatPassword" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Criar conta</button>
+            </form>
+        </div>
+    </div>
+</div>

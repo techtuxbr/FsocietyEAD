@@ -8,12 +8,18 @@
     const flash = require('connect-flash')
     const session = require('express-session')
     const methodOverride = require('method-override')
+    const passport = require("passport")
+    require('./config/auth')(passport)
 // App config
     // Session and Flash setup
         app.use(session({
             secret: 'a4f8071f-c873-4447-8ee2',
-            resave: false
+            resave: true,
+            saveUninitialized: true
         }))
+    // Passport config
+        app.use(passport.initialize())
+        app.use(passport.session())
         app.use(flash())
     // Global Vars
         app.use(function(req, res, next){
@@ -42,6 +48,7 @@
         }).then(() => console.log('MongoDB Connected...'))
         .catch(err => console.log(err))
 
+        
 // Routes
     // Main Routes
         app.get('/', (req, res) => {
@@ -53,12 +60,13 @@
     // Categories Routes
 
     // Users Routes
-
+        const users = require('./routes/users')
+        app.use('/users', users)
     // Courses Routes
 
     // Lesson Routes
 // Run Server
-    const PORT = 5000
+    const PORT = 9098
     app.listen(PORT, (err) => {
         if(err) throw err;
         console.log("UP And Running!")
