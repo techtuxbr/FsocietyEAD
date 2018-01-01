@@ -28,63 +28,70 @@
 
     router.get('/courses/add', ensureIsAdmin, (req, res) => {
         Category.find({}).then(categories => {
-            res.render('courses/add', {categories: categories})
+            User.find({role: 2}).then(users => {
+                res.render('courses/add', {categories: categories, authors: users})
+            }).catch(err => {
+                req.flash('error_msg', 'Houver um erro interno ao tentar carregar a lista de autores')
+                res.redirect('/admin/courses')                
+            })
         }).catch(err => {
             req.flash('error_msg', 'Houver um erro interno ao tentar carregar os dados do curso')
             res.redirect('/admin/courses')   
         })
     })
 
-    router.post('/courses/add', ensureIsAdmin, (req, res) => {
-        let errors = [];
-        if(!req.body.title){
-            errors.push({text: 'Por favor adicione um nome'})
-        }
-        if(!req.body.slug){
-            errors.push({text:'Por favor adicione uma slug'})
-        }
-        if(!req.body.category){
-            errors.push({text:'Por favor adicione uma categoria válida'})
-        }
-        if(!req.body.github){
-            errors.push({text:'Por favor adicione uma repositório GitHub'})
-        }
-        if(!req.body.thumbnail){
-            errors.push({text:'Por favor adicione uma thumbnail'})
-        }
+    // Creating course process
+        router.post('/courses/add', ensureIsAdmin, (req, res) => {
+            let errors = [];
+            if(!req.body.title){
+                errors.push({text: 'Por favor adicione um nome'})
+            }
+            if(!req.body.slug){
+                errors.push({text:'Por favor adicione uma slug'})
+            }
+            if(!req.body.category){
+                errors.push({text:'Por favor adicione uma categoria válida'})
+            }
+            if(!req.body.github){
+                errors.push({text:'Por favor adicione uma repositório GitHub'})
+            }
+            if(!req.body.thumbnail){
+                errors.push({text:'Por favor adicione uma thumbnail'})
+            }
 
-        if(req.body.category == "null"){
-            errors.push({text:'Crie uma categoria antes de criar um curso'})
-        }
+            if(req.body.category == "null"){
+                errors.push({text:'Crie uma categoria antes de criar um curso'})
+            }
 
-        if(errors.length > 0){
+            if(errors.length > 0){
 
-            Category.find({}).then(categories => {
-                res.render('courses/add', {categories: categories,errors: errors, 
+                Category.find({}).then(categories => {
+                    res.render('courses/add', {categories: categories,errors: errors, 
+                        title: req.body.title,
+                        slug: req.body.slug,
+                        description: req.body.description,
+                        github: req.body.github,
+                        thumbnail: req.body.thumbnail })
+                }).catch(err => {
+                    req.flash('error_msg', 'Houver um erro interno ao tentar carregar os dados do curso')
+                    res.redirect('/admin/courses')   
+                })
+            }else{
+                const newCourse = {
                     title: req.body.title,
                     slug: req.body.slug,
                     description: req.body.description,
                     github: req.body.github,
-                    thumbnail: req.body.thumbnail })
-            }).catch(err => {
-                req.flash('error_msg', 'Houver um erro interno ao tentar carregar os dados do curso')
-                res.redirect('/admin/courses')   
-            })
-        }else{
-            const newCourse = {
-                title: req.body.title,
-                slug: req.body.slug,
-                description: req.body.description,
-                github: req.body.github,
-                thumbnail: req.body.thumbnail,
-                category: req.body.category
+                    thumbnail: req.body.thumbnail,
+                    category: req.body.category,
+                    author: req.body.author
+                }
+                new Course(newCourse).save().then((course) => {
+                    req.flash('success_msg', 'Curso criado com sucesso')
+                    res.redirect("/admin")
+                })
             }
-            new Course(newCourse).save().then((course) => {
-                req.flash('success_msg', 'Curso criado com sucesso')
-                res.redirect("/admin")
-            })
-        }
-    })
+        })
 
     router.get('/courses/edit/:id', ensureIsAdmin, (req, res) => {
         Course.findOne({_id: req.params.id}).then(course => {

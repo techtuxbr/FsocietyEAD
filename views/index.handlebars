@@ -3,3 +3,17 @@
 	<p class="lead">Aprenda do 0 Ao 1</p>
 	<a href="/users/register" class="btn btn-dark btn-lg">Crie uma conta</a>
 </div>
+
+<h1>Cursos recentes: </h1>
+<hr>
+{{#each courses}}
+	<div class="card" style="width: 18rem;">
+	<img class="card-img-top" src="{{thumbnail}}" alt="Card image cap">
+	<div class="card-body">
+		<h5 class="card-title bold">{{title}}</h5>
+		<center><a href="/courses/{{slug}}" class="btn btn-primary">Iniciar curso</a></center>
+	</div>
+	</div>
+{{else}}
+
+{{/each}}

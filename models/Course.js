@@ -12,9 +12,9 @@ const CourseSchema = new Schema({
         default: ''
     },
     author:{
-        type: String,
+        type: Schema.Types.ObjectId,
         required: true,
-        default: '0072018' 
+        ref: 'users' 
     },
     category: {
         type: Schema.Types.ObjectId,

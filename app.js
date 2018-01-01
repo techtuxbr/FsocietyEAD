@@ -10,6 +10,8 @@
     const methodOverride = require('method-override')
     const passport = require("passport")
     require('./config/auth')(passport)
+    require('./models/Course')
+    const Course = mongoose.model('courses')
 // App config
     // Session and Flash setup
         app.use(session({
@@ -52,7 +54,9 @@
 // Routes
     // Main Routes
         app.get('/', (req, res) => {
-            res.render('index');
+            Course.find({}).populate('author').sort('desc').then(courses =>{
+                res.render('index', {courses: courses});
+            })
         })
     // Admin Routes
         const admin = require('./routes/admin')
@@ -63,10 +67,11 @@
         const users = require('./routes/users')
         app.use('/users', users)
     // Courses Routes
-
+        const courses = require('./routes/courses')
+        app.use('/courses', courses)
     // Lesson Routes
 // Run Server
-    const PORT = 9098
+    const PORT = 3098
     app.listen(PORT, (err) => {
         if(err) throw err;
         console.log("UP And Running!")
