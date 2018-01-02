@@ -5,8 +5,8 @@ Open source LMS for Fsociety Brasil
 
 ## Stack do projeto, (MEAN): 
 
-  Node
-  Express
-  Mongoose
-  Angular 4.X (Em breve)
+  #### Node
+  #### Express
+  #### Mongoose
+  ### Angular 4.X (Em breve)
 
