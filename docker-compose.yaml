@@ -1,0 +1,26 @@
+version: '3'
+services:
+  db:
+    image: mongo
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+  fsead_app:
+    build: .
+    container_name: "fsocietyEAD_app"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mongodb
+    ports:
+      - 3098:3098 
+    links:
+      - db
+    depends_on:
+      - db
+    command: node app.js
