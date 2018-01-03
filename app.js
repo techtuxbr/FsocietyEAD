@@ -9,6 +9,7 @@
     const session = require('express-session')
     const methodOverride = require('method-override')
     const passport = require("passport")
+    const DB_HOST = process.env.DB_HOST || "localhost"
     require('./config/auth')(passport)
     require('./models/Course')
     const Course = mongoose.model('courses')
@@ -45,7 +46,7 @@
 
     // Mongoose ODM config
         mongoose.Promise = global.Promise;
-        mongoose.connect('mongodb://localhost/fsocietyead-dev', {
+        mongoose.connect(`mongodb://${DB_HOST}/fsocietyead-dev`, {
         useMongoClient: true
         }).then(() => console.log('MongoDB Connected...'))
         .catch(err => console.log(err))
