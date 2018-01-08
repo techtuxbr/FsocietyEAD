@@ -9,10 +9,13 @@
     const session = require('express-session')
     const methodOverride = require('method-override')
     const passport = require("passport")
+    const cors = require("cors")
     require('./config/auth')(passport)
     require('./models/Course')
     const Course = mongoose.model('courses')
 // App config
+    // Cors
+        app.use(cors())
     // Session and Flash setup
         app.use(session({
             secret: 'a4f8071f-c873-4447-8ee2',
@@ -55,7 +58,7 @@
     // Main Routes
         app.get('/', (req, res) => {
             Course.find({}).populate('author').sort('desc').then(courses =>{
-                res.render('index', {courses: courses});
+                res.render("index",{courses: courses})
             })
         })
     // Admin Routes

@@ -2,13 +2,19 @@ const express = require('express')
 const router = express.Router();
 const mongoose = require('mongoose')
 require('../models/Course')
+require('../models/Lesson')
 const Course = mongoose.model('courses')
-
+const Lesson = mongoose.model("lessons")
 
 router.get("/:slug", (req, res) => {
-    Course.findOne({slug: req.params.slug}).then(course => {
+    Course.findOne({slug: req.params.slug}).populate("category").populate("author").then(course => {
         if(course){
-            res.render('courses/course', {course: course})
+            Lesson.find({course: course._id}).then((lessons) => {
+                res.render('courses/course', {course: course, lessons: lessons})
+            }).catch((err) => {
+                req.flash("error_msg", "Erro ao carregas as aulas")
+                res.redirect('/')      
+            })
         }else{
             req.flash("error_msg", "Este curso não existe!")
             res.redirect('/')         

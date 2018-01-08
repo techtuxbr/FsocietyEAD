@@ -1,3 +1,61 @@
-<h2>{{course.title}}</h2> 
-<p>{{course.description}}</p>
-<a href="{{course.github}}"><button class="btn btn-success"><span class="glyphicon glyphicon-folder-open"></span>Código fonte</button></a>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-7">
+                <h2>{{course.title}}</h2>
+                <p>{{course.description}}</p> 
+            </div>
+            <div class="col-md-5">
+                <img src="{{course.thumbnail}}" alt="" width="400" class="">
+            </div>
+        </div>
+        <a href="{{course.github}}"><button class="btn btn-success">Código fonte</button></a>
+        <span class="ml-2 badge badge-primary">{{course.category.name}}</span>
+    </div>
+</div>
+
+<h4 class="text-secondary mt-4">Aulas</h4>
+<hr>
+{{#each lessons}}
+
+<div class="card mt-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-1">
+                <img src="http://icons.iconarchive.com/icons/danieledesantis/audio-video-outline/256/play-icon.png" alt="" width="70">
+            </div>
+            <div class="col-md-9">
+                <h4 class="mt-3">{{title}}</h4>
+            </div>
+            <div class="col-md-2 mt-3">
+                <p><span class="duration">{{time}}</span> Minutos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{else}}
+
+{{/each}}
+
+
+<div class="row">
+    <div class="card col-md-12 mt-4">
+        <div class="card-body">
+            <h4 class="text-secondary">Instrutor </h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-2">
+                    <img class="img-thumbnail" src="{{course.author.picture}}" alt="">
+                </div>
+                <div class="col-md-10">
+                    <h4 class="text-info">{{course.author.name}} {{course.author.surname}}</h4>
+                    <p> {{course.author.bio}}</p>
+                </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="/js/tool.js"></script>
