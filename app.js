@@ -73,6 +73,10 @@
         const courses = require('./routes/courses')
         app.use('/courses', courses)
 // Run Server
+    // Error 404 Page
+        app.use(function(req,res){
+            res.render('404');
+        });
     const PORT = 3098
     app.listen(PORT, (err) => {
         if(err) throw err;
