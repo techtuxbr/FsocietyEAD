@@ -72,7 +72,6 @@
     // Courses Routes
         const courses = require('./routes/courses')
         app.use('/courses', courses)
-    // Lesson Routes
 // Run Server
     const PORT = 3098
     app.listen(PORT, (err) => {
